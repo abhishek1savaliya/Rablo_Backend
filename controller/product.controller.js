@@ -55,7 +55,14 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getFeaturedProducts = async (req, res) => {
     try {
-        const featuredProducts = await Product.find({ featured: true });
+        let featuredProducts;
+        const value = req.query.value
+        if(value==='true' || value==='false'){
+         featuredProducts = await Product.find({ featured: value });
+        }else{
+            featuredProducts = await Product.find().sort({ createdAt: -1 });
+        }
+       
         res.send(featuredProducts);
     } catch (error) {
         res.status(500).send(error);
@@ -64,7 +71,7 @@ exports.getFeaturedProducts = async (req, res) => {
 
 exports.getProductsByPrice = async (req, res) => {
     try {
-        // Check if req.params.value is a valid number
+     
         const priceValue = parseFloat(req.params.value);
         
         let products;
