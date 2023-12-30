@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./Database/db');
 const productRoute = require('./route/product.route')
+const userRoute = require('./route/user.route')
 
 const app = express()
 
@@ -19,6 +20,7 @@ app.use(bodyParser.json())
 connectDb()
 
 app.use('/api',productRoute)
+app.use('/auth',userRoute)
 
 app.listen(PORT,()=>{
     console.log("server is running on PORT 5000")
