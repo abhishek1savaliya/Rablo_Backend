@@ -1,4 +1,4 @@
-const Product = require('../model/product.model'); 
+const Product = require('../model/product.model');
 
 exports.addProduct = async (req, res) => {
     try {
@@ -20,7 +20,8 @@ exports.addProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find().sort({ createdAt: -1 });
+        
         res.send(products);
     } catch (error) {
         res.status(500).send(error);
@@ -28,14 +29,6 @@ exports.getAllProducts = async (req, res) => {
 };
 
 exports.updateProduct = async (req, res) => {
-    const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'price', 'featured', 'rating', 'company']; 
-    const isValidOperation = updates.every(update => allowedUpdates.includes(update));
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' });
-    }
-
     try {
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         if (!product) {
@@ -52,9 +45,9 @@ exports.deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {
-            return res.status(404).send();
+            return res.status(404).send({message : "product not found"});
         }
-        res.send(product);
+        res.json({ message: true });
     } catch (error) {
         res.status(500).send(error);
     }
@@ -71,7 +64,17 @@ exports.getFeaturedProducts = async (req, res) => {
 
 exports.getProductsByPrice = async (req, res) => {
     try {
-        const products = await Product.find({ price: { $lt: parseFloat(req.params.value) } });
+        // Check if req.params.value is a valid number
+        const priceValue = parseFloat(req.params.value);
+        
+        let products;
+
+        if (isNaN(priceValue) || !req.params.value) {
+            products = await Product.find(); 
+        } else {
+            products = await Product.find({ price: { $lt: priceValue } });
+        }
+
         res.send(products);
     } catch (error) {
         res.status(500).send(error);
