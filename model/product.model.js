@@ -30,10 +30,13 @@ const ProductSchema = new Schema({
     }
 },
     {
-        timestamps: {
-            createdAt: true,
-            updatedAt: true,
+        toJSON: {
+            transform: function (doc, ret) {
+                delete ret.__v;
+
+            },
         },
+        timestamps: true
     });
 
 module.exports = mongoose.model('Product', ProductSchema);
